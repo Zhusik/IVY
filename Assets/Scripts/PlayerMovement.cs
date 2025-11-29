@@ -9,8 +9,10 @@ public class PlayerMovement : MonoBehaviour
 
     private bool isFacingRight = true;
     private bool canMove = true;
+    private bool isDead = false;
 
     private const string IS_WALKING = "IsRunning";
+    private const string IS_DEAD = "IsDead";
 
     private void Awake()
     {
@@ -25,9 +27,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-
-
-        if (!canMove) return;
+        if (!canMove || isDead) return;
 
         HandleMovement();
         UpdateAnimations();
@@ -53,12 +53,30 @@ public class PlayerMovement : MonoBehaviour
 
     private void UpdateAnimations()
     {
-        bool isWalking = Mathf.Abs(rb.linearVelocity.x) > 0.1f && canMove;
+        bool isWalking = Mathf.Abs(rb.linearVelocity.x) > 0.1f && canMove && !isDead;
         animator.SetBool(IS_WALKING, isWalking);
+        animator.SetBool(IS_DEAD, isDead);
+    }
+
+    public void Die()
+    {
+        if (isDead) return;
+
+        isDead = true;
+        canMove = false;
+        rb.linearVelocity = Vector2.zero;
+
+        animator.SetBool(IS_DEAD, true);
+        animator.SetBool(IS_WALKING, false);
+
+        Debug.Log("Player died!");
+
+        // Invoke("ReloadScene", 2f);
     }
 
     public void DisableMovement()
     {
+        if (isDead) return;
         canMove = false;
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
         animator.SetBool(IS_WALKING, false);
@@ -66,6 +84,14 @@ public class PlayerMovement : MonoBehaviour
 
     public void EnableMovement()
     {
+        if (isDead) return;
         canMove = true;
+    }
+
+    private void ReloadScene()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex
+        );
     }
 }
