@@ -11,8 +11,7 @@ public class PlayerMovement : MonoBehaviour
     private bool canMove = true;
     private bool isDead = false;
 
-    private const string IS_WALKING = "IsRunning";
-    private const string IS_DEAD = "IsDead";
+    private const string IS_RUNNING = "IsRunning";
 
     private void Awake()
     {
@@ -27,7 +26,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!canMove || isDead) return;
+        if (isDead || !canMove) return;
 
         HandleMovement();
         UpdateAnimations();
@@ -46,16 +45,15 @@ public class PlayerMovement : MonoBehaviour
     private void Flip()
     {
         isFacingRight = !isFacingRight;
-        Vector3 scale = transform.localScale;
-        scale.x *= -1;
-        transform.localScale = scale;
+        Vector3 s = transform.localScale;
+        s.x *= -1;
+        transform.localScale = s;
     }
 
     private void UpdateAnimations()
     {
-        bool isWalking = Mathf.Abs(rb.linearVelocity.x) > 0.1f && canMove && !isDead;
-        animator.SetBool(IS_WALKING, isWalking);
-        animator.SetBool(IS_DEAD, isDead);
+        bool walking = Mathf.Abs(rb.linearVelocity.x) > 0.1f;
+        animator.SetBool(IS_RUNNING, walking);
     }
 
     public void Die()
@@ -64,34 +62,29 @@ public class PlayerMovement : MonoBehaviour
 
         isDead = true;
         canMove = false;
+
         rb.linearVelocity = Vector2.zero;
 
-        animator.SetBool(IS_DEAD, true);
-        animator.SetBool(IS_WALKING, false);
+        animator.SetTrigger("Die");
+        animator.SetBool(IS_RUNNING, false);
 
         Debug.Log("Player died!");
-
-        // Invoke("ReloadScene", 2f);
     }
 
     public void DisableMovement()
     {
-        if (isDead) return;
-        canMove = false;
-        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-        animator.SetBool(IS_WALKING, false);
+        if (!isDead)
+        {
+            canMove = false;
+            animator.SetBool(IS_RUNNING, false);
+        }
     }
 
     public void EnableMovement()
     {
-        if (isDead) return;
-        canMove = true;
-    }
-
-    private void ReloadScene()
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(
-            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex
-        );
+        if (!isDead)
+        {
+            canMove = true;
+        }
     }
 }
