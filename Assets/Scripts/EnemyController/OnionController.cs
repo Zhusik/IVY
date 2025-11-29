@@ -4,7 +4,7 @@ using System.Collections;
 public class OnionController : MonoBehaviour
 {
     [SerializeField] float watchTime = 3f;
-    [SerializeField] float restTime = 5f;
+    [SerializeField] float restTime = 2f;
     [SerializeField] float targetHeight = 4.2f;
 
     private Animator anim;
