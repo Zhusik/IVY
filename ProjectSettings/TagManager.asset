@@ -39,6 +39,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: backgrond
+    uniqueID: 1098029031
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
